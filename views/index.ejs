@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="10">
+    <title>AirPro Dash</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Cabin|Roboto:400,700|Roboto+Condensed:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/circle.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><span style="font-weight: 900;">AirPro</span>Dash</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Help/Support</a></li>
+            <li><a href="#">Settings</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Chris A. <span class="caret"></span></a>
+              <!-- <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+              </ul> -->
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2 sidebar">
+          <ul class="sidebar-nav">
+                <li class="home active">
+                    <a href="#">
+                      <div class="nav-icons">
+                        <i class="fa fa-tachometer"></i>
+                      </div>
+                      Home
+                    </a>
+                </li>
+                <!-- <li class="recruit">
+                  <a href="#">
+                    <div class="nav-icons">
+                      <i class="fa fa-user"></i>
+                    </div>
+                    Graph
+                  </a>
+                </li>
+                <li class="reports">
+                  <a href="#">
+                    <div class="nav-icons">
+                      <i class="fa fa-line-chart"></i>
+                    </div>
+                    Reports
+                  </a>
+                </li>
+                <li class="dev">
+                  <a href="#">
+                    <div class="nav-icons">
+                      <i class="fa fa-cogs"></i>
+                    </div>
+                    Development
+                  </a>
+                </li> -->
+                <!-- <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-fw fa-plus"></i> Dropdown <span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li class="dropdown-header">Dropdown heading</li>
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li><a href="#">Separated link</a></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </li> -->
+                <!-- <li>
+                  <a href="#">
+                    <div class="nav-icons">
+                      <i class="fa fa-fw fa-home"></i>
+                    </div>
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <div class="nav-icons">
+                      <i class="fa fa-fw fa-home"></i>
+                    </div>
+                    Home
+                  </a>
+                </li> -->
+                <!-- <li class="info">
+                  <a href="#">
+                    <div class="nav-icons">
+                      <i class="fa fa-info"></i>
+                    </div>
+                    Info
+                  </a>
+                </li> -->
+            </ul>
+        </div>
+        <div class="col-md-10 title">
+          <h2><i class="fa fa-line-chart icon"></i> AirPro</h2>
+        </div>
+        <div class="col-md-10 main">
+          <div class="line-container">
+            <canvas id="line-chart"></canvas>
+          </div>
+
+          <div class="pie-container">
+            <canvas id="pie-chart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="c100 p<%=Math.round(data.field4/5) %>">
+            <span><%=data.field4%></span>
+            <div class="slice">
+              <div class="bar"></div>
+              <div class="fill"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="c100 p<%=Math.round(data.field1/3) %>">
+            <span><%=data.field1%></span>
+            <div class="slice">
+              <div class="bar"></div>
+              <div class="fill"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="c100 p75">
+            <span>25%</span>
+            <div class="slice">
+              <div class="bar"></div>
+              <div class="fill"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="c100 p20">
+            <span>25%</span>
+            <div class="slice">
+              <div class="bar"></div>
+              <div class="fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/jquery-3.2.1.slim.min.js" charset="utf-8"></script>
+    <script src="assets/js/bootstrap.min.js" charset="utf-8"></script>
+    <script src="assets/js/functions.js" charset="utf-8"></script>
+    </body>
+</html>
