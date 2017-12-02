@@ -6,12 +6,12 @@ MQ135 gasSensor = MQ135(A0);
 unsigned long duration;
 unsigned long starttime;
 unsigned long endtime;
-unsigned long responseTime = 20000;
+unsigned long responseTime = 30000;
 unsigned long lowpulseoccupancy = 0;
 float ratio = 0;
 float concentration = 0;
 int pm2_5 = 8;
-int CO = A2;
+byte buff[2];
 
 String gpsInfo[5];
 String lat, lon, utc;
@@ -26,15 +26,14 @@ void setup()
 {
 	Serial.begin(9600);
 	gsm.begin(9600);
-	if (gsm.available())
+	if (gsm.available() > 0)
 		Serial.println("Config GSM Module");
-	delay(2000);
 	Serial.flush();
 	gsm.flush();
+	delay(2000);
 	// for GPS
-	sendIt("AT+CGNSPWR=1", 1000, true);
-	sendIt("AT+CGPSINF=0", 1000, true);
-
+	
+  sendIt("AT\r", 1000, true);
 	// for GPRS service
 	sendIt("AT+CGATT?\r", 1000, true);
 	// bearer settings
@@ -42,17 +41,20 @@ void setup()
 	// APN settings
 	sendIt("AT+SAPBR=3,1,\"APN\",\"internet\"\r", 2000, true);
 	// Test
-	sendIt("AT+SAPBR=1,1r", 2000, true);
+	sendIt("AT+SAPBR=1,1\r", 2000, true);
 	sendIt("AT+SAPBR=2,1\r", 2000, true);
 	// Init http service
 	sendIt("AT+HTTPINIT\r", 1000, true);
 	sendIt("AT+HTTPPARA=\"CID\",1\r", 2000, true);
+  sendIt("AT+CGNSPWR=1\r", 2000, true);
+  sendIt("AT+CGPSINF=0\r", 2000, true);
 	Serial.println("Done!...");
 
 	// Pinmode set
 	pinMode(pm2_5, INPUT);
 	pinMode(A0, INPUT);
 	pinMode(A1, INPUT);
+    pinMode(A2, INPUT);
 	starttime = millis();
 }
 
@@ -66,17 +68,20 @@ void loop()
 	if ((endtime - starttime) > responseTime)
 	{
 		ratio = (lowpulseoccupancy - endtime + starttime + responseTime) / (responseTime * 10.0); // Integer percentage 0=>100
-		concentration = 1.1 * pow(ratio, 3) - 3.8 * pow(ratio, 2) + 520 * ratio + 0.62;			  // using spec sheet curve
+		concentration = (1.1 * pow(ratio, 3) - 3.8 * pow(ratio, 2) + 520 * ratio + 0.62) / 10.0;			  // using spec sheet curve
 
-    sensorValue = analogRead(A1);
+        sensorValue = analogRead(A1);
 
 		float mq135 = gasSensor.getPPM();
-
-		int mq7 = analogRead(CO);
 
 		sensor_volt = (float)sensorValue / 1024 * 5.0;
 		RS_gas = (5.0 - sensor_volt) / sensor_volt; // omit *RL
 		ratioMQ2 = RS_gas / 0.50;
+
+		float V_RL = analogRead(A2)* 3.3/4095;
+		float ppm = 3.027*exp(1.0698*V_RL);
+
+		aqi = (concentration + ratioMQ2 + ppm + mq135)/5;
 
 		getGPSData();
 
@@ -85,7 +90,7 @@ void loop()
 		gsm.print("&field2=");
 		gsm.print(mq135);
 		gsm.print("&field3=");
-		gsm.print(mq7);
+		gsm.print(ppm);
 		gsm.print("&field4=");
 		gsm.print(concentration);
 		gsm.print("&field5=");
@@ -94,11 +99,9 @@ void loop()
 		gsm.print(lon);
 		gsm.print("&field7=");
 		gsm.print(aqi);
-		gsm.print("&field8=");
-		gsm.print(utc);
-		sendIt("\"\n", 100, true);
+		sendIt("\"\r", 1000, true);
 		// Get request
-		sendIt("AT+HTTPACTION=0\n", 2000, true);
+		sendIt("AT+HTTPACTION=0\r", 1000, true);
 		Serial.println("\nData Sent ! ");
 
 		lowpulseoccupancy = 0;

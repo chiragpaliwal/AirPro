@@ -135,16 +135,17 @@
         </div>
         <div class="col-md-2">
           <div class="c100 p<%=Math.round(data.field4/2.5) %>">
-            <span><%=data.field4%></span>
+            <span>Pm 2.5</span>
             <div class="slice">
-              <div class="bar" style="border: 0.08em solid #5FABDF;"></div>
+              <div class="bar" style="border: 0.08em solid #DE6262;"></div>
               <div class="fill"></div>
             </div>
           </div>
         </div>
+
         <div class="col-md-2">
           <div class="c100 p<%=Math.round(data.field1/3) %>">
-            <span><%=data.field1%></span>
+            <span>Smoke</span>
             <div class="slice">
               <div class="bar" style="border: 0.08em solid #70c67f;"></div>
               <div class="fill"></div>
@@ -152,23 +153,39 @@
           </div>
         </div>
         <div class="col-md-2">
-          <div class="c100 p<%=Math.round(data.field3/34) %>">
-            <span><%=data.field3%></span>
+          <div class="c100 p<%=Math.round(data.field3*10) %>">
+            <span>CO</span>
             <div class="slice">
               <div class="bar" style="border: 0.08em solid #DE6262;"></div>
               <div class="fill"></div>
             </div>
           </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
           <div class="c100 p<%=Math.round(data.field2/18) %>">
-            <span><%=data.field2%></span>
+            <span>NH3</span>
             <div class="slice">
               <div class="bar" style="border: 0.08em solid #5FABDF;"></div>
               <div class="fill"></div>
             </div>
           </div>
         </div>
+        <div class="col-md-2">
+          <h2 class="sign"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></h2>
+        </div>
+
+        <div class="col-md-2">
+          <h2 class="sign"><i class="fa fa-check" aria-hidden="true"></i></h2>
+        </div>
+
+        <div class="col-md-2">
+          <h2 class="sign"><i class="fa fa-times" aria-hidden="true"></i></h2>
+        </div>
+
+        <div class="col-md-2">
+          <h2 class="sign"><i class="fa fa-check" aria-hidden="true"></i></h2>
+        </div>
+
       </div>
     </div>
 
