@@ -1,0 +1,162 @@
+#include <SoftwareSerial.h>
+#include <MQ135.h>
+SoftwareSerial gsm(2, 3);
+MQ135 gasSensor = MQ135(A0);
+
+unsigned long duration;
+unsigned long starttime;
+unsigned long endtime;
+unsigned long responseTime = 20000;
+unsigned long lowpulseoccupancy = 0;
+float ratio = 0;
+float concentration = 0;
+int pm2_5 = 8;
+int CO = A2;
+
+String gpsInfo[5];
+String lat, lon, utc;
+
+float aqi;
+float sensor_volt;
+float RS_gas;   // Get value of RS in a GAS
+float ratioMQ2; // Get ratio RS_GAS/RS_air
+int sensorValue;
+
+void setup()
+{
+	Serial.begin(9600);
+	gsm.begin(9600);
+	if (gsm.available())
+		Serial.println("Config GSM Module");
+	delay(2000);
+	Serial.flush();
+	gsm.flush();
+	// for GPS
+	sendIt("AT+CGNSPWR=1", 1000, true);
+	sendIt("AT+CGPSINF=0", 1000, true);
+
+	// for GPRS service
+	sendIt("AT+CGATT?\r", 1000, true);
+	// bearer settings
+	sendIt("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r", 2000, true);
+	// APN settings
+	sendIt("AT+SAPBR=3,1,\"APN\",\"internet\"\r", 2000, true);
+	// Test
+	sendIt("AT+SAPBR=1,1r", 2000, true);
+	sendIt("AT+SAPBR=2,1\r", 2000, true);
+	// Init http service
+	sendIt("AT+HTTPINIT\r", 1000, true);
+	sendIt("AT+HTTPPARA=\"CID\",1\r", 2000, true);
+	Serial.println("Done!...");
+
+	// Pinmode set
+	pinMode(pm2_5, INPUT);
+	pinMode(A0, INPUT);
+	pinMode(A1, INPUT);
+	starttime = millis();
+}
+
+void loop()
+{
+	
+	duration = pulseIn(pm2_5, LOW);
+	lowpulseoccupancy += duration;
+	endtime = millis();
+
+	if ((endtime - starttime) > responseTime)
+	{
+		ratio = (lowpulseoccupancy - endtime + starttime + responseTime) / (responseTime * 10.0); // Integer percentage 0=>100
+		concentration = 1.1 * pow(ratio, 3) - 3.8 * pow(ratio, 2) + 520 * ratio + 0.62;			  // using spec sheet curve
+
+    sensorValue = analogRead(A1);
+
+		float mq135 = gasSensor.getPPM();
+
+		int mq7 = analogRead(CO);
+
+		sensor_volt = (float)sensorValue / 1024 * 5.0;
+		RS_gas = (5.0 - sensor_volt) / sensor_volt; // omit *RL
+		ratioMQ2 = RS_gas / 0.50;
+
+		getGPSData();
+
+		gsm.print("AT+HTTPPARA=\"URL\",\"http://api.thingspeak.com/update?api_key=IU1DPU7AA5F9XNHO&field1=");
+		gsm.print(ratioMQ2);
+		gsm.print("&field2=");
+		gsm.print(mq135);
+		gsm.print("&field3=");
+		gsm.print(mq7);
+		gsm.print("&field4=");
+		gsm.print(concentration);
+		gsm.print("&field5=");
+		gsm.print(lat);
+		gsm.print("&field6=");
+		gsm.print(lon);
+		gsm.print("&field7=");
+		gsm.print(aqi);
+		gsm.print("&field8=");
+		gsm.print(utc);
+		sendIt("\"\n", 100, true);
+		// Get request
+		sendIt("AT+HTTPACTION=0\n", 2000, true);
+		Serial.println("\nData Sent ! ");
+
+		lowpulseoccupancy = 0;
+		starttime = millis();
+	}
+}
+
+String sendIt(String command, const int timeout, boolean debug)
+{
+	String rd = "";
+	gsm.print(command);
+	long int time = millis();
+	while ((time + timeout) > millis())
+	{
+		while (gsm.available())
+		{
+			char c = gsm.read();
+			rd += c;
+		}
+	}
+	if (debug)
+		Serial.print(rd);
+	return rd;
+}
+
+void getGPSData()
+{
+	const int timeout = 1000;
+	gsm.println("AT+CGNSINF");
+	long int time = millis();
+	int i = 0;
+
+	while ((time + timeout) > millis())
+	{
+		while (gsm.available())
+		{
+			char c = gsm.read();
+			if (c != ',')
+			{ //read characters until you find comma, if found increment
+				gpsInfo[i] += c;
+				delay(50);
+			}
+			else
+			{
+				i++;
+			}
+			if (i == 5)
+			{
+				delay(10);
+				goto exitL;
+			}
+		}
+	}
+exitL:
+	utc = gpsInfo[2];
+	lat = gpsInfo[3];
+	lon = gpsInfo[4];
+	gpsInfo[2] = "";
+	gpsInfo[3] = "";
+	gpsInfo[4] = "";
+}
