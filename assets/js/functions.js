@@ -8,6 +8,22 @@ $(document).ready(function () {
       e.preventDefault();
   });
 
+  $('.pm').click(function() {
+      $('#pm').toggle('slow');
+  });
+
+  $('.smoke').click(function() {
+      $('#smoke').toggle('slow');
+  });
+
+  $('.co').click(function() {
+      $('#co').toggle('slow');
+  });
+
+  $('.nh3').click(function() {
+      $('#nh3').toggle('slow');
+  });
+
 var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var config1 = {
         type: 'line',
